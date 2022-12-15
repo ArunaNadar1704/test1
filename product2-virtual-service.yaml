@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: product2-virtual-service
+  namespace: n2
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - asm-ingress/asm-ingressgateway
+  http:
+  - route:
+    - destination:
+        host: product2-service.n2.svc.cluster.local
+        port:
+          number: 80

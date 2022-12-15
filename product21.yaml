@@ -1,0 +1,115 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product2
+  namespace: n2
+spec:
+  selector:
+    matchLabels:
+      app: product2-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: product2-service
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          httpGet:
+            scheme: HTTP
+            path: /index.html
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        volumeMounts:
+            - name: nginx-public
+              mountPath: /usr/share/nginx/html/
+      volumes:
+      - name: nginx-public
+        configMap:
+          name: product2-index-html-configmap
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: product2-index-html-configmap
+  namespace: n1
+data:
+  index.html: |
+    <html>
+    <h1>Welcome To Webapp 01</h1>
+    </br>
+    <h1>Hi! You are Trying to Access Webapp Through GKE Ingress </h1>
+    </html
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product2-service
+  namespace: n2
+spec:
+  selector:
+    app: product2-service
+  type: ClusterIP
+  ports:
+    - port: 80
+      protocol: TCP
+
+
+
+
+
+
+
+
+
+      -----------------------------------------------------------------------------------------
+
+
+      ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product2
+  namespace: n2
+  labels:
+    names: product2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product2-service
+  template:
+    metadata:
+      labels:
+        app: product2-service
+    spec:
+      containers:
+      - name: product2-service
+        image: nginx
+        #imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product2-service
+  namespace: n2
+  labels:
+    app: product2-service
+spec:
+  #type: ExternalName
+  #externalName: product1-service.p1.svc.cluster.local
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    app: product2-service
+  type: ClusterIP
+---

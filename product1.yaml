@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product1
+  namespace: n1
+  labels:
+    names: product1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product1-service
+  template:
+    metadata:
+      labels:
+        app: product1-service
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        #imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product1-service
+  namespace: n1
+  labels:
+    app: product1-service
+spec:
+  #type: ExternalName
+  #externalName: product1-service.p1.svc.cluster.local
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    app: product1-service
+  type: ClusterIP
+---
